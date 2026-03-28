@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Dashboard | AI Fundraising Intelligence Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: "#00ff9c",
+                        deep: "#0b0f19",
+                        panel: "#121826"
+                    },
+                    boxShadow: {
+                        glow: "0 0 0 1px rgba(0,255,156,0.08), 0 24px 60px rgba(0,0,0,0.35)"
+                    }
+                }
+            }
+        };
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
+</head>
+<body class="bg-deep text-white font-[Space_Grotesk] min-h-screen">
+    <div class="app-shell min-h-screen lg:grid lg:grid-cols-[292px_minmax(0,1fr)]">
+        <aside class="border-b border-white/5 bg-panel/70 px-6 py-6 backdrop-blur-xl lg:border-b-0 lg:border-r">
+            <div class="rounded-3xl border border-white/8 bg-black/20 p-5 shadow-glow">
+                <p class="text-xs uppercase tracking-[0.35em] text-brand">AI Fundraising OS</p>
+                <h1 class="mt-3 text-2xl font-bold leading-tight text-white">AI Startup Fundraising Intelligence Platform</h1>
+                <p class="mt-3 text-sm leading-6 text-slate-400">Welcome back, {{ current_user.name }}. Build a sharper fundraising pipeline with live investor intelligence.</p>
+            </div>
+
+            <nav class="mt-8 space-y-3">
+                <a href="{{ url_for('dashboard') }}" class="sidebar-link {% if active_page == 'dashboard' %}sidebar-link-active{% endif %}">Dashboard</a>
+                <a href="#discover-section" class="sidebar-link">Discover Investors</a>
+                <a href="{{ url_for('saved_investors') }}" class="sidebar-link {% if active_page == 'crm' %}sidebar-link-active{% endif %}">
+                    <span>Saved Investors</span>
+                    <span class="rounded-full bg-white/5 px-2 py-0.5 text-xs text-slate-400">{{ saved_count }}</span>
+                </a>
+                <a href="{{ url_for('deck_analyzer') }}" class="sidebar-link {% if active_page == 'deck' %}sidebar-link-active{% endif %}">Pitch Deck Analyzer</a>
+                <a href="#competitor-section" class="sidebar-link">Competitor Analysis</a>
+                <a href="#settings-section" class="sidebar-link">Settings</a>
+                <a href="{{ url_for('auth.logout') }}" class="sidebar-link sidebar-link-danger">Logout</a>
+            </nav>
+
+            <div class="mt-8 rounded-3xl border border-white/8 bg-black/20 p-5">
+                <p class="text-xs uppercase tracking-[0.3em] text-slate-500">Platform Mode</p>
+                <div class="mt-4 flex items-center justify-between">
+                    <div>
+                        <div class="text-sm text-slate-400">Current runtime</div>
+                        <div class="mt-1 text-lg font-semibold text-white">{{ platform_mode|upper }}</div>
+                    </div>
+                    <span class="rounded-full border border-brand/20 bg-brand/10 px-3 py-1 text-xs font-semibold text-brand">OpenAI + Playwright</span>
+                </div>
+            </div>
+
+            <div class="mt-8 rounded-3xl border border-white/8 bg-black/20 p-5">
+                <p class="text-xs uppercase tracking-[0.3em] text-slate-500">Data Sources</p>
+                <div class="mt-4 flex flex-wrap gap-2">
+                    {% for source in scan_targets %}
+                        <span class="rounded-full border border-white/8 bg-white/[0.03] px-3 py-1 text-xs text-slate-300">{{ source }}</span>
+                    {% endfor %}
+                    {% for source in portfolio_targets %}
+                        <span class="rounded-full border border-white/8 bg-white/[0.03] px-3 py-1 text-xs text-slate-300">{{ source }} Portfolio</span>
+                    {% endfor %}
+                </div>
+            </div>
+        </aside>
+
+        <main class="px-6 py-6 lg:px-10 lg:py-8">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="mb-6 space-y-3">
+                        {% for category, message in messages %}
+                            <div class="flash-card rounded-2xl border px-4 py-3 text-sm {{ 'border-emerald-400/20 bg-emerald-400/10 text-emerald-200' if category == 'success' else 'border-sky-400/20 bg-sky-400/10 text-sky-200' if category == 'info' else 'border-rose-400/20 bg-rose-400/10 text-rose-200' }}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            <section id="dashboard-overview" class="rounded-[28px] border border-white/6 bg-panel/75 p-6 shadow-glow backdrop-blur-xl">
+                <div class="grid gap-8 xl:grid-cols-[minmax(0,1.25fr)_360px] xl:items-end">
+                    <div>
+                        <span class="inline-flex rounded-full border border-brand/20 bg-brand/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-brand">Fundraising Command Center</span>
+                        <h2 class="mt-5 max-w-4xl text-4xl font-bold leading-tight tracking-tight text-white lg:text-5xl">
+                            Discover investors, analyze fit, generate outreach, and manage pipeline momentum in one product.
+                        </h2>
+                        <p class="mt-5 max-w-3xl text-base leading-8 text-slate-400">
+                            The platform combines live VC scraping, AI scorecards, portfolio intelligence, warm intro paths, deck review, competitor mapping, and funding probability forecasting for founders actively raising.
+                        </p>
+                    </div>
+                    <div class="rounded-3xl border border-white/8 bg-black/20 p-5">
+                        <p class="text-xs uppercase tracking-[0.3em] text-slate-500">Active Modules</p>
+                        <div class="mt-4 grid gap-2 sm:grid-cols-2">
+                            {% for feature in feature_cards %}
+                                <div class="rounded-2xl border border-white/5 bg-white/[0.03] px-3 py-2 text-sm text-slate-300">{{ feature }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                    <div class="stat-card rounded-3xl border border-white/8 bg-black/20 p-5">
+                        <div class="text-xs uppercase tracking-[0.3em] text-slate-500">Saved Investors</div>
+                        <div class="mt-3 text-3xl font-bold text-white">{{ saved_count }}</div>
+                        <div class="mt-2 text-sm text-slate-400">CRM-ready investor pipeline</div>
+                    </div>
+                    <div class="stat-card rounded-3xl border border-white/8 bg-black/20 p-5">
+                        <div class="text-xs uppercase tracking-[0.3em] text-slate-500">Scanning Firms</div>
+                        <div class="mt-3 text-3xl font-bold text-white">{{ scan_targets|length }}</div>
+                        <div class="mt-2 text-sm text-slate-400">Live partner and team discovery</div>
+                    </div>
+                    <div class="stat-card rounded-3xl border border-white/8 bg-black/20 p-5">
+                        <div class="text-xs uppercase tracking-[0.3em] text-slate-500">Portfolio Sources</div>
+                        <div class="mt-3 text-3xl font-bold text-white">{{ portfolio_targets|length }}</div>
+                        <div class="mt-2 text-sm text-slate-400">Firm portfolio intelligence feeds</div>
+                    </div>
+                    <div class="stat-card rounded-3xl border border-white/8 bg-black/20 p-5">
+                        <div class="text-xs uppercase tracking-[0.3em] text-slate-500">AI Runtime</div>
+                        <div class="mt-3 text-3xl font-bold text-white">{{ platform_mode|upper }}</div>
+                        <div class="mt-2 text-sm text-slate-400">Automatic fallback protection</div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="discover-section" class="mt-8 grid gap-6 2xl:grid-cols-[380px_minmax(0,1fr)]">
+                <div class="rounded-[28px] border border-white/6 bg-panel/75 p-6 shadow-glow backdrop-blur-xl">
+                    <div class="flex items-start justify-between gap-4">
+                        <div>
+                            <p class="text-sm uppercase tracking-[0.3em] text-brand">Investor Discovery</p>
+                            <h3 class="mt-3 text-2xl font-semibold text-white">Startup profile</h3>
+                        </div>
+                        <span class="rounded-full border border-white/8 bg-black/20 px-3 py-1 text-xs font-medium text-slate-300">Real VC scraping</span>
+                    </div>
+                    <p class="mt-3 text-sm leading-7 text-slate-400">
+                        Enter your startup profile once. The platform will scan VC websites, extract investor data, analyze portfolio overlap, and return prioritized investor scorecards with warm intro pathways.
+                    </p>
+
+                    <form id="discover-form" class="mt-6 space-y-5">
+                        <div>
+                            <label for="domain" class="mb-2 block text-sm font-medium text-slate-200">Startup Domain</label>
+                            <input id="domain" name="domain" type="text" required placeholder="AI, FinTech, Logistics, HealthTech..." class="input-shell">
+                        </div>
+                        <div>
+                            <label for="stage" class="mb-2 block text-sm font-medium text-slate-200">Funding Stage</label>
+                            <select id="stage" name="stage" required class="input-shell">
+                                <option value="">Select a stage</option>
+                                <option value="Pre-Seed">Pre-Seed</option>
+                                <option value="Seed">Seed</option>
+                                <option value="Series A">Series A</option>
+                                <option value="Series B">Series B</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="location" class="mb-2 block text-sm font-medium text-slate-200">Startup Location</label>
+                            <input id="location" name="location" type="text" placeholder="Bangalore, San Francisco, London..." class="input-shell">
+                        </div>
+                        <div>
+                            <label for="startup-description" class="mb-2 block text-sm font-medium text-slate-200">Startup Description</label>
+                            <textarea id="startup-description" name="startup_description" rows="5" placeholder="What are you building, for whom, and what traction do you have?" class="input-shell"></textarea>
+                        </div>
+                        <button id="discover-button" type="submit" class="primary-button w-full">
+                            Find Investors
+                        </button>
+                    </form>
+                </div>
+
+                {% include "investor_results.html" %}
+            </section>
+
+            <section id="competitor-section" class="mt-8 grid gap-6 xl:grid-cols-2">
+                <div class="rounded-[28px] border border-white/6 bg-panel/75 p-6 shadow-glow backdrop-blur-xl">
+                    <div class="flex items-start justify-between gap-4">
+                        <div>
+                            <p class="text-sm uppercase tracking-[0.3em] text-brand">Competitor Intelligence</p>
+                            <h3 class="mt-3 text-2xl font-semibold text-white">Map the market narrative</h3>
+                        </div>
+                        <span class="rounded-full border border-white/8 bg-black/20 px-3 py-1 text-xs text-slate-300">AI-generated benchmarking</span>
+                    </div>
+                    <form id="competitor-form" class="mt-6 space-y-5">
+                        <div>
+                            <label for="competitor-domain" class="mb-2 block text-sm font-medium text-slate-200">Startup Domain</label>
+                            <input id="competitor-domain" name="domain" type="text" placeholder="AI logistics, FinTech infra, SaaS..." class="input-shell">
+                        </div>
+                        <div>
+                            <label for="startup-idea" class="mb-2 block text-sm font-medium text-slate-200">Startup Idea</label>
+                            <textarea id="startup-idea" name="startup_idea" rows="4" placeholder="Describe the startup and what makes it differentiated..." class="input-shell"></textarea>
+                        </div>
+                        <button id="competitor-button" type="submit" class="secondary-button w-full">Analyze Competitors</button>
+                    </form>
+
+                    <div id="competitor-loading" class="mt-6 hidden rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-slate-300">
+                        Building competitor intelligence...
+                    </div>
+                    <div id="competitor-error" class="mt-4 hidden rounded-2xl border border-rose-400/20 bg-rose-400/10 px-4 py-3 text-sm text-rose-200"></div>
+                    <div id="competitor-results" class="mt-6 space-y-4">
+                        <div class="rounded-3xl border border-dashed border-white/10 bg-black/20 p-8 text-center text-sm text-slate-500">
+                            Analyze your startup idea to surface funded competitors and positioning cues.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid gap-6">
+                    <div class="rounded-[28px] border border-white/6 bg-panel/75 p-6 shadow-glow backdrop-blur-xl">
+                        <div class="flex items-start justify-between gap-4">
+                            <div>
+                                <p class="text-sm uppercase tracking-[0.3em] text-brand">Funding Probability Predictor</p>
+                                <h3 class="mt-3 text-2xl font-semibold text-white">Estimate fundraising readiness</h3>
+                            </div>
+                            <span class="rounded-full border border-white/8 bg-black/20 px-3 py-1 text-xs text-slate-300">Signal-based model</span>
+                        </div>
+                        <form id="funding-form" class="mt-6 space-y-5">
+                            <div class="grid gap-5 md:grid-cols-2">
+                                <div>
+                                    <label for="funding-domain" class="mb-2 block text-sm font-medium text-slate-200">Domain</label>
+                                    <input id="funding-domain" name="domain" type="text" placeholder="AI, FinTech, Climate..." class="input-shell">
+                                </div>
+                                <div>
+                                    <label for="funding-stage" class="mb-2 block text-sm font-medium text-slate-200">Stage</label>
+                                    <select id="funding-stage" name="stage" class="input-shell">
+                                        <option value="Seed">Seed</option>
+                                        <option value="Series A">Series A</option>
+                                        <option value="Series B">Series B</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="grid gap-5 md:grid-cols-2">
+                                <div>
+                                    <label for="team-size" class="mb-2 block text-sm font-medium text-slate-200">Team Size</label>
+                                    <input id="team-size" name="team_size" type="number" min="1" placeholder="8" class="input-shell">
+                                </div>
+                                <div>
+                                    <label for="market" class="mb-2 block text-sm font-medium text-slate-200">Market</label>
+                                    <input id="market" name="market" type="text" placeholder="Enterprise, mid-market, global..." class="input-shell">
+                                </div>
+                            </div>
+                            <div>
+                                <label for="traction" class="mb-2 block text-sm font-medium text-slate-200">Traction</label>
+                                <textarea id="traction" name="traction" rows="3" placeholder="Pilots, ARR, growth rate, design partners..." class="input-shell"></textarea>
+                            </div>
+                            <button id="funding-button" type="submit" class="secondary-button w-full">Predict Funding Probability</button>
+                        </form>
+
+                        <div id="funding-loading" class="mt-6 hidden rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-slate-300">
+                            Modeling fundraising probability...
+                        </div>
+                        <div id="funding-error" class="mt-4 hidden rounded-2xl border border-rose-400/20 bg-rose-400/10 px-4 py-3 text-sm text-rose-200"></div>
+                        <div id="funding-results" class="mt-6">
+                            <div class="rounded-3xl border border-dashed border-white/10 bg-black/20 p-8 text-center text-sm text-slate-500">
+                                Add your startup signals to estimate fundraising probability and see factor-level drivers.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="settings-section" class="rounded-[28px] border border-white/6 bg-panel/75 p-6 shadow-glow backdrop-blur-xl">
+                        <p class="text-sm uppercase tracking-[0.3em] text-brand">Settings Snapshot</p>
+                        <div class="mt-4 grid gap-4 md:grid-cols-2">
+                            <div class="rounded-3xl border border-white/8 bg-black/20 p-5">
+                                <div class="text-xs uppercase tracking-[0.3em] text-slate-500">Workspace User</div>
+                                <div class="mt-3 text-lg font-semibold text-white">{{ current_user.name }}</div>
+                                <div class="mt-2 text-sm text-slate-400">{{ current_user.email }}</div>
+                            </div>
+                            <div class="rounded-3xl border border-white/8 bg-black/20 p-5">
+                                <div class="text-xs uppercase tracking-[0.3em] text-slate-500">Runtime Mode</div>
+                                <div class="mt-3 text-lg font-semibold text-white">{{ platform_mode|upper }}</div>
+                                <div class="mt-2 text-sm text-slate-400">Live AI features automatically fall back to demo responses when credentials are unavailable.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

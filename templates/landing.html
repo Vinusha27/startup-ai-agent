@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AI Startup Fundraising Intelligence Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: "#00ff9c",
+                        deep: "#0b0f19",
+                        panel: "#121826"
+                    }
+                }
+            }
+        };
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
+</head>
+<body class="bg-deep text-white font-[Space_Grotesk] min-h-screen">
+    <div class="relative overflow-hidden">
+        <div class="absolute inset-0 bg-grid opacity-50"></div>
+        <div class="absolute left-[-8rem] top-[-6rem] h-80 w-80 rounded-full bg-brand/15 blur-3xl"></div>
+        <div class="absolute bottom-[-10rem] right-[-4rem] h-96 w-96 rounded-full bg-cyan-400/10 blur-3xl"></div>
+
+        <header class="relative z-10 mx-auto flex max-w-7xl items-center justify-between px-6 py-6 lg:px-8">
+            <a href="{{ url_for('landing') }}" class="text-lg font-semibold tracking-wide text-white">AI Fundraising Intelligence Platform</a>
+            <nav class="flex items-center gap-3">
+                <a href="{{ url_for('auth.login') }}" class="secondary-button">Login</a>
+                <a href="{{ url_for('auth.signup') }}" class="primary-button">Get Started</a>
+            </nav>
+        </header>
+
+        <main class="relative z-10 mx-auto max-w-7xl px-6 pb-20 pt-10 lg:px-8 lg:pt-16">
+            <section class="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+                <div>
+                    <span class="inline-flex rounded-full border border-brand/20 bg-brand/10 px-4 py-2 text-sm text-brand">Modern AI workflow for startup fundraising</span>
+                    <h1 class="mt-6 max-w-5xl text-5xl font-bold leading-tight tracking-tight text-white lg:text-7xl">
+                        Find the right investors, sharpen your narrative, and run fundraising like a product team.
+                    </h1>
+                    <p class="mt-6 max-w-2xl text-lg leading-8 text-slate-300">
+                        AI Startup Fundraising Intelligence Platform combines investor discovery, fit scoring, portfolio analysis, warm intro pathways, CRM workflows, deck review, competitor mapping, and fundraising probability forecasting in one workspace.
+                    </p>
+                    <div class="mt-8 flex flex-wrap gap-4">
+                        <a href="{{ url_for('auth.signup') }}" class="primary-button">Get Started</a>
+                        <a href="{{ url_for('auth.login') }}" class="secondary-button">Login</a>
+                    </div>
+                    <div class="mt-10 grid gap-4 md:grid-cols-3">
+                        <div class="rounded-3xl border border-white/8 bg-panel/70 p-4">
+                            <div class="text-xs uppercase tracking-[0.25em] text-slate-500">Discovery</div>
+                            <div class="mt-2 text-lg font-semibold text-white">Live VC scraping</div>
+                            <div class="mt-2 text-sm text-slate-400">Sequoia and Accel investor extraction with structured JSON.</div>
+                        </div>
+                        <div class="rounded-3xl border border-white/8 bg-panel/70 p-4">
+                            <div class="text-xs uppercase tracking-[0.25em] text-slate-500">Intelligence</div>
+                            <div class="mt-2 text-lg font-semibold text-white">AI scorecards</div>
+                            <div class="mt-2 text-sm text-slate-400">Domain, stage, geography, and portfolio similarity in one investor fit view.</div>
+                        </div>
+                        <div class="rounded-3xl border border-white/8 bg-panel/70 p-4">
+                            <div class="text-xs uppercase tracking-[0.25em] text-slate-500">Execution</div>
+                            <div class="mt-2 text-lg font-semibold text-white">CRM + outreach</div>
+                            <div class="mt-2 text-sm text-slate-400">Save investors, draft outreach, and keep fundraising momentum organized.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="rounded-[32px] border border-white/10 bg-panel/75 p-6 shadow-[0_30px_90px_rgba(0,0,0,0.45)] backdrop-blur-xl">
+                    <div class="rounded-[28px] border border-white/8 bg-black/20 p-6">
+                        <p class="text-xs uppercase tracking-[0.3em] text-brand">Platform Modules</p>
+                        <div class="mt-6 grid gap-4">
+                            <div class="feature-card rounded-3xl border border-white/8 bg-white/[0.03] p-5">
+                                <h3 class="text-lg font-semibold text-white">Investor Discovery + Portfolio Analysis</h3>
+                                <p class="mt-2 text-sm leading-6 text-slate-400">Scrape real VC team and portfolio pages, extract investors, and attach contextual fit signals automatically.</p>
+                            </div>
+                            <div class="feature-card rounded-3xl border border-white/8 bg-white/[0.03] p-5">
+                                <h3 class="text-lg font-semibold text-white">Outreach + Warm Intro Finder</h3>
+                                <p class="mt-2 text-sm leading-6 text-slate-400">Turn investor research into personalized next steps with AI-generated outreach drafts and intro pathways.</p>
+                            </div>
+                            <div class="feature-card rounded-3xl border border-white/8 bg-white/[0.03] p-5">
+                                <h3 class="text-lg font-semibold text-white">Deck + Market Intelligence</h3>
+                                <p class="mt-2 text-sm leading-6 text-slate-400">Analyze pitch decks, understand competitors, and predict fundraising readiness before the next meeting.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+</html>

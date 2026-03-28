@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Pitch Deck Analyzer | AI Fundraising Intelligence Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: "#00ff9c",
+                        deep: "#0b0f19",
+                        panel: "#121826"
+                    }
+                }
+            }
+        };
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
+</head>
+<body class="bg-deep text-white font-[Space_Grotesk] min-h-screen">
+    <div class="app-shell min-h-screen lg:grid lg:grid-cols-[292px_minmax(0,1fr)]">
+        <aside class="border-b border-white/5 bg-panel/70 px-6 py-6 backdrop-blur-xl lg:border-b-0 lg:border-r">
+            <div class="rounded-3xl border border-white/8 bg-black/20 p-5">
+                <p class="text-xs uppercase tracking-[0.35em] text-brand">Pitch Deck Analyzer</p>
+                <h1 class="mt-3 text-2xl font-bold text-white">AI review for fundraising readiness</h1>
+                <p class="mt-3 text-sm leading-6 text-slate-400">Upload a PDF deck and get scoring across problem clarity, market size, traction, team strength, and investor readiness.</p>
+            </div>
+
+            <nav class="mt-8 space-y-3">
+                <a href="{{ url_for('dashboard') }}" class="sidebar-link {% if active_page == 'dashboard' %}sidebar-link-active{% endif %}">Dashboard</a>
+                <a href="{{ url_for('dashboard') }}#discover-section" class="sidebar-link">Discover Investors</a>
+                <a href="{{ url_for('saved_investors') }}" class="sidebar-link {% if active_page == 'crm' %}sidebar-link-active{% endif %}">
+                    <span>Saved Investors</span>
+                    <span class="rounded-full bg-white/5 px-2 py-0.5 text-xs text-slate-400">{{ saved_count }}</span>
+                </a>
+                <a href="{{ url_for('deck_analyzer') }}" class="sidebar-link {% if active_page == 'deck' %}sidebar-link-active{% endif %}">Pitch Deck Analyzer</a>
+                <a href="{{ url_for('dashboard') }}#competitor-section" class="sidebar-link">Competitor Analysis</a>
+                <a href="{{ url_for('dashboard') }}#settings-section" class="sidebar-link">Settings</a>
+                <a href="{{ url_for('auth.logout') }}" class="sidebar-link sidebar-link-danger">Logout</a>
+            </nav>
+        </aside>
+
+        <main class="px-6 py-6 lg:px-10 lg:py-8">
+            <section class="rounded-[28px] border border-white/6 bg-panel/75 p-6 shadow-glow backdrop-blur-xl">
+                <div class="grid gap-8 xl:grid-cols-[380px_minmax(0,1fr)]">
+                    <div>
+                        <p class="text-sm uppercase tracking-[0.3em] text-brand">Deck Upload</p>
+                        <h2 class="mt-3 text-3xl font-bold tracking-tight text-white">Upload your fundraising deck</h2>
+                        <p class="mt-4 text-base leading-7 text-slate-400">
+                            The analyzer reviews your narrative like an associate would, then surfaces strengths, weaknesses, and score breakdowns you can act on before investor meetings.
+                        </p>
+
+                        <form id="analyze-deck-form" class="mt-6 space-y-5" enctype="multipart/form-data">
+                            <div>
+                                <label for="deck-domain" class="mb-2 block text-sm font-medium text-slate-200">Startup Domain</label>
+                                <input id="deck-domain" name="domain" type="text" placeholder="AI logistics, FinTech, developer tools..." class="input-shell">
+                            </div>
+                            <div>
+                                <label for="deck-stage" class="mb-2 block text-sm font-medium text-slate-200">Funding Stage</label>
+                                <select id="deck-stage" name="stage" class="input-shell">
+                                    <option value="Seed">Seed</option>
+                                    <option value="Series A">Series A</option>
+                                    <option value="Series B">Series B</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="pitch-deck" class="mb-2 block text-sm font-medium text-slate-200">Pitch Deck PDF</label>
+                                <input id="pitch-deck" name="pitch_deck" type="file" accept="application/pdf" class="input-shell file:mr-4 file:rounded-full file:border-0 file:bg-brand file:px-4 file:py-2 file:text-sm file:font-semibold file:text-slate-950 hover:file:bg-emerald-300">
+                            </div>
+                            <button id="analyze-deck-button" type="submit" class="primary-button w-full">Analyze Pitch Deck</button>
+                        </form>
+
+                        <div id="deck-loading" class="mt-6 hidden rounded-3xl border border-brand/20 bg-brand/10 p-4 text-sm text-brand">
+                            Parsing PDF, reviewing narrative, and scoring fundraising readiness...
+                        </div>
+                        <div id="deck-error" class="mt-4 hidden rounded-3xl border border-rose-400/20 bg-rose-400/10 px-4 py-3 text-sm text-rose-200"></div>
+                    </div>
+
+                    <div class="grid gap-5">
+                        <div class="rounded-3xl border border-white/8 bg-black/20 p-5">
+                            <div class="text-xs uppercase tracking-[0.3em] text-slate-500">Pitch Score</div>
+                            <div id="deck-score" class="mt-3 text-5xl font-bold text-white">--</div>
+                            <div id="deck-summary" class="mt-4 text-sm leading-7 text-slate-300">
+                                Upload a deck to see an AI scoring summary and improvement plan.
+                            </div>
+                        </div>
+                        <div id="deck-evaluations" class="rounded-3xl border border-white/8 bg-black/20 p-5">
+                            <div class="text-sm font-semibold text-white">Evaluation Breakdown</div>
+                            <div class="mt-4 space-y-4 text-sm text-slate-400">
+                                <div>Problem Clarity, Market Size, Traction, Team Strength, and Investment Readiness scores will appear here.</div>
+                            </div>
+                        </div>
+                        <div class="grid gap-5 md:grid-cols-2">
+                            <div class="rounded-3xl border border-white/8 bg-black/20 p-5">
+                                <div class="text-sm font-semibold text-white">Strengths</div>
+                                <ul id="deck-strengths" class="mt-4 space-y-3 text-sm text-slate-300">
+                                    <li class="text-slate-500">No analysis yet.</li>
+                                </ul>
+                            </div>
+                            <div class="rounded-3xl border border-white/8 bg-black/20 p-5">
+                                <div class="text-sm font-semibold text-white">Suggestions</div>
+                                <ul id="deck-improvements" class="mt-4 space-y-3 text-sm text-slate-300">
+                                    <li class="text-slate-500">No analysis yet.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

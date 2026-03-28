@@ -1,0 +1,8 @@
+flask
+flask-login
+playwright
+python-dotenv
+openai
+werkzeug
+pdfplumber
+# sqlite3 is included with Python's standard library
